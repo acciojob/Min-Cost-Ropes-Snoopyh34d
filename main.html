@@ -1,16 +1,91 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-	<link rel="stylesheet" href="styles.css">
-</head>
+<title>Min Cost Ropes</title>
+<style>
+body {
+  font-family: sans-serif;
+}
 
+#output {
+  margin-top: 20px;
+  font-weight: bold;
+}
+</style>
+</head>
 <body>
-	<!-- the entire body must be written by student -->
-    <script type="text/javascript" src="./script.js">
+
+<h1>Min Cost Ropes</h1>
+
+<label for="input">Enter rope lengths (comma-separated):</label><br>
+<input type="text" id="input" placeholder="e.g., 4,3,2,6"><br><br>
+
+<button onclick="calculateMinCost()">Calculate</button>
+
+<div id="output"></div>
+
+<script>
+function mincost(arr) {
+  // Create a min-heap using a JavaScript array
+  const minHeap = [];
+  function heapify(i) {
+    const left = 2 * i + 1;
+    const right = 2 * i + 2;
+    let smallest = i;
+    if (left < minHeap.length && minHeap[left] < minHeap[smallest]) {
+      smallest = left;
+    }
+    if (right < minHeap.length && minHeap[right] < minHeap[smallest]) {
+      smallest = right;
+    }
+    if (smallest !== i) {
+      [minHeap[i], minHeap[smallest]] = [minHeap[smallest], minHeap[i]];
+      heapify(smallest);
+    }
+  }
+  function insert(x) {
+    minHeap.push(x);
+    let i = minHeap.length - 1;
+    while (i > 0 && minHeap[Math.floor(i / 2)] > minHeap[i]) {
+      [minHeap[i], minHeap[Math.floor(i / 2)]] = [minHeap[Math.floor(i / 2)], minHeap[i]];
+      i = Math.floor(i / 2);
+    }
+  }
+  function extractMin() {
+    if (minHeap.length === 0) {
+      return null;
+    }
+    const root = minHeap[0];
+    minHeap[0] = minHeap[minHeap.length - 1];
+    minHeap.pop();
+    heapify(0);
+    return root;
+  }
+
+  // Add rope lengths to the min-heap
+  for (const length of arr) {
+    insert(length);
+  }
+
+  let totalCost = 0;
+  while (minHeap.length > 1) {
+    const rope1 = extractMin();
+    const rope2 = extractMin();
+    const combinedCost = rope1 + rope2;
+    totalCost += combinedCost;
+    insert(combinedCost);
+  }
+
+  return totalCost;
+}
+
+function calculateMinCost() {
+  const inputStr = document.getElementById("input").value;
+  const ropeLengths = inputStr.split(",").map(Number);
+  const minCost = mincost(ropeLengths);
+  document.getElementById("output").innerHTML = "Minimum cost: " + minCost;
+}
 </script>
 
 </body>
-
 </html>
